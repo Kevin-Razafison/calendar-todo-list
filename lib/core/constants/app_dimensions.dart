@@ -52,4 +52,3 @@ class AppDimensions {
   static const double colorPickerSize     = 28.0;
   static const double colorPickerSpacing  = 10.0;
 }
-}
