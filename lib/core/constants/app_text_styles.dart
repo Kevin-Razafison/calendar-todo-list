@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
+import '../../core/utils/responsive_utils.dart';
 
 /// Toutes les tailles sont relatives — on utilisera
 /// un facteur d'échelle dans les widgets si besoin.
@@ -111,4 +112,43 @@ class AppTextStyles {
     color: AppColors.textOnSticky,
     height: 1.4,
   );
+}
+
+// Ajoute à la fin de app_text_styles.dart :
+
+/// Styles qui s'adaptent à la taille d'écran
+class ResponsiveTextStyles {
+  static TextStyle monthMiniTitle(BuildContext context) => TextStyle(
+    fontFamily: 'Roboto',
+    fontSize: ResponsiveUtils.fontMiniMonth(context),
+    fontWeight: FontWeight.w800,
+    letterSpacing: 1.0,
+    color: AppColors.textDark,
+  );
+
+  static TextStyle monthMiniDayNumber(BuildContext context) => TextStyle(
+    fontFamily: 'Roboto',
+    fontSize: ResponsiveUtils.fontMiniMonth(context),
+    fontWeight: FontWeight.w400,
+    color: AppColors.textDark,
+  );
+
+  static TextStyle monthMainTitle(BuildContext context) => TextStyle(
+    fontFamily: 'Roboto',
+    fontSize: ResponsiveUtils.fontMonthTitle(context),
+    fontWeight: FontWeight.w800,
+    letterSpacing: 2.0,
+    color: AppColors.textMonthTitle,
+  );
+
+  static TextStyle stickyNote(BuildContext context, {bool isCompact = false}) =>
+      TextStyle(
+        fontFamily: 'Caveat',
+        fontSize: isCompact
+            ? ResponsiveUtils.fontMiniMonth(context)
+            : ResponsiveUtils.fontMainMonth(context),
+        fontWeight: FontWeight.w400,
+        color: AppColors.textOnSticky,
+        height: 1.2,
+      );
 }

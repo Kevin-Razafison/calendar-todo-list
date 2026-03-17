@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/sticky_note.dart';
 import '../models/calendar_event.dart';
 import '../models/quick_note.dart';
+import 'package:home_widget/home_widget.dart';
 
 /// Gère la persistance et l'état de toutes les notes,
 /// événements et quick notes via SharedPreferences.
@@ -20,9 +21,9 @@ class NotesProvider extends ChangeNotifier {
   bool get isLoaded => _isLoaded;
 
   // Clés SharedPreferences
-  static const _kNotes       = 'sticky_notes';
-  static const _kEvents      = 'calendar_events';
-  static const _kQuickNotes  = 'quick_notes';
+  static const _kNotes = 'sticky_notes';
+  static const _kEvents = 'calendar_events';
+  static const _kQuickNotes = 'quick_notes';
 
   // ── Init ─────────────────────────────────────────────────────────────────
 
@@ -34,21 +35,27 @@ class NotesProvider extends ChangeNotifier {
     final rawNotes = prefs.getString(_kNotes);
     if (rawNotes != null) {
       final list = jsonDecode(rawNotes) as List<dynamic>;
-      _notes.addAll(list.map((e) => StickyNote.fromMap(e as Map<String, dynamic>)));
+      _notes.addAll(
+        list.map((e) => StickyNote.fromMap(e as Map<String, dynamic>)),
+      );
     }
 
     // Events
     final rawEvents = prefs.getString(_kEvents);
     if (rawEvents != null) {
       final list = jsonDecode(rawEvents) as List<dynamic>;
-      _events.addAll(list.map((e) => CalendarEvent.fromMap(e as Map<String, dynamic>)));
+      _events.addAll(
+        list.map((e) => CalendarEvent.fromMap(e as Map<String, dynamic>)),
+      );
     }
 
     // Quick Notes
     final rawQuick = prefs.getString(_kQuickNotes);
     if (rawQuick != null) {
       final list = jsonDecode(rawQuick) as List<dynamic>;
-      _quickNotes.addAll(list.map((e) => QuickNote.fromMap(e as Map<String, dynamic>)));
+      _quickNotes.addAll(
+        list.map((e) => QuickNote.fromMap(e as Map<String, dynamic>)),
+      );
     }
 
     _isLoaded = true;
@@ -58,25 +65,67 @@ class NotesProvider extends ChangeNotifier {
   // ── Accesseurs filtrés ───────────────────────────────────────────────────
 
   List<StickyNote> notesForMonth({required int year, required int month}) =>
-      _notes.where((n) => n.date.year == year && n.date.month == month).toList();
+      _notes
+          .where((n) => n.date.year == year && n.date.month == month)
+          .toList();
 
-  List<StickyNote> notesForDay({required int year, required int month, required int day}) =>
-      _notes.where((n) =>
-        n.date.year == year &&
-        n.date.month == month &&
-        n.date.day == day,
-      ).toList();
+  List<StickyNote> notesForDay({
+    required int year,
+    required int month,
+    required int day,
+  }) => _notes
+      .where(
+        (n) =>
+            n.date.year == year && n.date.month == month && n.date.day == day,
+      )
+      .toList();
 
   List<CalendarEvent> eventsForMonth({required int year, required int month}) =>
-      _events.where((e) => e.date.year == year && e.date.month == month).toList();
+      _events
+          .where((e) => e.date.year == year && e.date.month == month)
+          .toList();
 
   List<QuickNote> get quickNotes => List.unmodifiable(_quickNotes);
 
   // ── CRUD StickyNote ──────────────────────────────────────────────────────
 
+  Future<void> _updateHomeWidget() async {
+    try {
+      // Prépare les notes du mois actuel pour le widget
+      final now = DateTime.now();
+      final monthNotes = notesForMonth(year: now.year, month: now.month);
+
+      // Sérialise les notes pour le widget Android
+      final notesJson = monthNotes
+          .map(
+            (n) => {
+              'id': n.id,
+              'text': n.text,
+              'day': n.date.day,
+              'color': n.color.name,
+            },
+          )
+          .toList();
+
+      await HomeWidget.saveWidgetData<String>(
+        'current_month_notes',
+        jsonEncode(notesJson),
+      );
+      await HomeWidget.saveWidgetData<String>(
+        'notes_count',
+        monthNotes.length.toString(),
+      );
+      await HomeWidget.updateWidget(androidName: 'CalendarWidgetProvider');
+    } catch (e) {
+      // Widget pas installé ou erreur — on ignore silencieusement
+      debugPrint('HomeWidget update failed: $e');
+    }
+  }
+
   Future<void> addNote(StickyNote note) async {
     _notes.add(note);
     await _saveNotes();
+    await _updateHomeWidget();
     notifyListeners();
   }
 
@@ -85,12 +134,14 @@ class NotesProvider extends ChangeNotifier {
     if (i == -1) return;
     _notes[i] = updated;
     await _saveNotes();
+    await _updateHomeWidget();
     notifyListeners();
   }
 
   Future<void> deleteNote(String noteId) async {
     _notes.removeWhere((n) => n.id == noteId);
     await _saveNotes();
+    await _updateHomeWidget();
     notifyListeners();
   }
 

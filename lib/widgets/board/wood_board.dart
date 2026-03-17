@@ -24,9 +24,6 @@ class WoodBoard extends StatelessWidget {
         ],
       ),
       child: Listener(
-        onPointerDown: (event) {
-          print('🪵 WoodBoard pointer down');
-        },
         child: ClipRRect(
           borderRadius: BorderRadius.circular(
             AppDimensions.woodCornerRadius + 2,
@@ -125,12 +122,7 @@ class _InnerBoard extends StatelessWidget {
           ),
         ],
       ),
-      child: Listener(
-        onPointerDown: (event) {
-          print('📦 _InnerBoard pointer down');
-        },
-        child: child,
-      ),
+      child: Listener(child: child),
     );
   }
 }

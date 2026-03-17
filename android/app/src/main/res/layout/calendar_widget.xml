@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/widget_background"
+    android:padding="12dp">
+
+    <!-- En-tête : Mois + Année -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingBottom="8dp">
+
+        <TextView
+            android:id="@+id/widget_month_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="MARCH 2026"
+            android:textColor="#1A1008"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.1" />
+
+        <!-- Bouton ajouter note -->
+        <ImageButton
+            android:id="@+id/widget_add_button"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@android:drawable/ic_input_add"
+            android:background="@drawable/add_button_bg"
+            android:contentDescription="Add note" />
+    </LinearLayout>
+
+    <!-- Jours de la semaine -->
+    <LinearLayout
+        android:id="@+id/widget_day_headers"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_weight="1" android:text="S" android:textColor="#C62828"
+            android:textSize="10sp" android:gravity="center" android:textStyle="bold"/>
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_weight="1" android:text="M" android:textColor="#4A3728"
+            android:textSize="10sp" android:gravity="center" android:textStyle="bold"/>
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_weight="1" android:text="T" android:textColor="#4A3728"
+            android:textSize="10sp" android:gravity="center" android:textStyle="bold"/>
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_weight="1" android:text="W" android:textColor="#4A3728"
+            android:textSize="10sp" android:gravity="center" android:textStyle="bold"/>
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_weight="1" android:text="T" android:textColor="#4A3728"
+            android:textSize="10sp" android:gravity="center" android:textStyle="bold"/>
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_weight="1" android:text="F" android:textColor="#4A3728"
+            android:textSize="10sp" android:gravity="center" android:textStyle="bold"/>
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_weight="1" android:text="S" android:textColor="#C62828"
+            android:textSize="10sp" android:gravity="center" android:textStyle="bold"/>
+    </LinearLayout>
+
+    <!-- Grille des jours — RemoteViews ListView -->
+    <ListView
+        android:id="@+id/widget_calendar_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:divider="@null" />
+
+</LinearLayout>

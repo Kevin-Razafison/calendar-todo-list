@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'app.dart';
 import 'providers/notes_provider.dart';
 import 'providers/calendar_provider.dart';
+import 'package:home_widget/home_widget.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -21,6 +22,7 @@ void main() async {
   );
   final notesProvider = NotesProvider();
   await notesProvider.loadAll();
+  HomeWidget.setAppGroupId('com.example.arck_calendar');
   runApp(
     MultiProvider(
       providers: [

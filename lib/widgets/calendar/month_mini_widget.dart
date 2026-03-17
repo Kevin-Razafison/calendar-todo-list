@@ -40,7 +40,7 @@ class MonthMiniWidget extends StatelessWidget {
         children: [
           Text(
             month.monthName,
-            style: AppTextStyles.monthMiniTitle,
+            style: ResponsiveTextStyles.monthMiniTitle(context),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 1),

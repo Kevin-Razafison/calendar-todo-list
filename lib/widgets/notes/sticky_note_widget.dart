@@ -64,18 +64,15 @@ class _StickyBody extends StatelessWidget {
           child: Text(
             note.text,
             style:
-                (isCompact
-                        ? AppTextStyles.stickyNoteMini
-                        : AppTextStyles.stickyNoteMain)
-                    .copyWith(
-                      // ← isBold et isItalic appliqués ici
-                      fontWeight: note.isBold
-                          ? FontWeight.w800
-                          : FontWeight.w400,
-                      fontStyle: note.isItalic
-                          ? FontStyle.italic
-                          : FontStyle.normal,
-                    ),
+                ResponsiveTextStyles.stickyNote(
+                  context,
+                  isCompact: isCompact,
+                ).copyWith(
+                  fontWeight: note.isBold ? FontWeight.w800 : FontWeight.w400,
+                  fontStyle: note.isItalic
+                      ? FontStyle.italic
+                      : FontStyle.normal,
+                ),
             maxLines: isCompact ? 2 : 4,
             overflow: TextOverflow.ellipsis,
           ),

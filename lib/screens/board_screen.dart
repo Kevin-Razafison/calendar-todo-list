@@ -13,6 +13,7 @@ import '../widgets/notes/quick_notes_bar.dart';
 import '../widgets/notes/add_note_dialog.dart';
 import '../widgets/notes/add_quick_note_dialog.dart';
 import '../main.dart';
+import 'package:home_widget/home_widget.dart';
 
 class BoardScreen extends StatefulWidget {
   const BoardScreen({super.key});
@@ -22,6 +23,13 @@ class BoardScreen extends StatefulWidget {
 }
 
 class _BoardScreenState extends State<BoardScreen> {
+  @override
+  void initState() {
+    super.initState();
+    _handleWidgetIntent();
+    HomeWidget.widgetClicked.listen(_handleWidgetClick);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -162,6 +170,28 @@ class _BoardScreenState extends State<BoardScreen> {
     if (!mounted) return;
     if (picked != null) {
       context.read<NotesProvider>().linkQuickNoteToDate(note.id, picked);
+    }
+  }
+
+  Future<void> _handleWidgetIntent() async {
+    final uri = await HomeWidget.initiallyLaunchedFromHomeWidget();
+    if (uri != null) _processWidgetUri(uri);
+  }
+
+  void _handleWidgetClick(Uri? uri) {
+    if (uri != null) _processWidgetUri(uri);
+  }
+
+  void _processWidgetUri(Uri uri) {
+    final action = uri.queryParameters['action'];
+    final dateStr = uri.queryParameters['date'];
+
+    if (action == 'add_note' && dateStr != null) {
+      final date = DateTime.parse(dateStr);
+      // Ouvre directement le dialog d'ajout
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _onDayTap(date);
+      });
     }
   }
 }
