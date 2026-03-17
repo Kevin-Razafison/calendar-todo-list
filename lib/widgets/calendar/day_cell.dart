@@ -5,12 +5,13 @@ import '../../core/constants/app_text_styles.dart';
 import '../../models/sticky_note.dart';
 import '../../models/calendar_event.dart';
 import '../notes/sticky_note_widget.dart';
+import '../notes/note_stack_dialog.dart';
 
 class DayCell extends StatelessWidget {
-  final int? day; // null = cellule vide
+  final int? day;
   final bool isToday;
   final bool isSunday;
-  final bool isMain; // true = mois central
+  final bool isMain;
   final List<StickyNote> notes;
   final List<CalendarEvent> events;
   final VoidCallback? onTap;
@@ -30,48 +31,42 @@ class DayCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('DayCell $day, onTap is ${onTap != null ? 'non-null' : 'null'}');
     if (day == null) return const SizedBox.shrink();
 
-    return Listener(
-      onPointerDown: (event) {
-        print('👆 Pointer down on day $day');
-      },
-      child: GestureDetector(
-        onTap: () {
-          print('🔥 DayCell tapped for day $day');
-          if (onTap != null) onTap!();
-        },
-        behavior: HitTestBehavior.opaque, // ← AJOUTE ÇA
-        child: Container(
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: AppColors.boardGrid.withValues(alpha: 0.5),
-              width: 0.5,
-            ),
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: AppColors.boardGrid.withValues(alpha: 0.5),
+            width: 0.5,
           ),
-          child: isMain
-              ? _MainCell(
-                  day: day!,
-                  isToday: isToday,
-                  isSunday: isSunday,
-                  notes: notes,
-                  events: events,
-                  onNoteTap: onNoteTap,
-                )
-              : _MiniCell(
-                  day: day!,
-                  isToday: isToday,
-                  isSunday: isSunday,
-                  notes: notes,
-                ),
         ),
+        child: isMain
+            ? _MainCell(
+                day: day!,
+                isToday: isToday,
+                isSunday: isSunday,
+                notes: notes,
+                events: events,
+                onNoteTap: onNoteTap,
+                onAddNote: onTap,
+              )
+            : _MiniCell(
+                day: day!,
+                isToday: isToday,
+                isSunday: isSunday,
+                notes: notes,
+                onNoteTap: onNoteTap, // ← ajouté
+                onAddNote: onTap, // ← ajouté
+              ),
       ),
     );
   }
 }
 
-// ── Cellule du mois central ────────────────────────────────────────────────
+// ── Cellule mois central ───────────────────────────────────────────────────
 
 class _MainCell extends StatelessWidget {
   final int day;
@@ -80,6 +75,7 @@ class _MainCell extends StatelessWidget {
   final List<StickyNote> notes;
   final List<CalendarEvent> events;
   final void Function(StickyNote)? onNoteTap;
+  final VoidCallback? onAddNote;
 
   const _MainCell({
     required this.day,
@@ -88,6 +84,7 @@ class _MainCell extends StatelessWidget {
     required this.notes,
     required this.events,
     this.onNoteTap,
+    this.onAddNote,
   });
 
   @override
@@ -95,7 +92,6 @@ class _MainCell extends StatelessWidget {
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        // ── Numéro du jour ─────────────────────────────────────────────
         Positioned(
           top: 3,
           left: 4,
@@ -107,7 +103,6 @@ class _MainCell extends StatelessWidget {
           ),
         ),
 
-        // ── Événements texte (sous le numéro) ──────────────────────────
         if (events.isNotEmpty)
           Positioned(
             top: 20,
@@ -129,7 +124,6 @@ class _MainCell extends StatelessWidget {
             ),
           ),
 
-        // ── Stack de post-its ──────────────────────────────────────────
         if (notes.isNotEmpty)
           Positioned(
             bottom: 2,
@@ -138,6 +132,32 @@ class _MainCell extends StatelessWidget {
               notes: notes,
               isMain: true,
               onNoteTap: onNoteTap,
+              onAddNote: onAddNote,
+            ),
+          ),
+
+        if (notes.isNotEmpty)
+          Positioned(
+            top: 3,
+            right: 4,
+            child: Container(
+              width: 14,
+              height: 14,
+              decoration: BoxDecoration(
+                color: AppColors.woodMedium.withValues(alpha: 0.15),
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: AppColors.woodMedium.withValues(alpha: 0.3),
+                  width: 0.8,
+                ),
+              ),
+              child: Center(
+                child: Icon(
+                  Icons.add,
+                  size: 9,
+                  color: AppColors.woodMedium.withValues(alpha: 0.5),
+                ),
+              ),
             ),
           ),
       ],
@@ -145,19 +165,23 @@ class _MainCell extends StatelessWidget {
   }
 }
 
-// ── Cellule d'un mini-mois ─────────────────────────────────────────────────
+// ── Cellule mini-mois ──────────────────────────────────────────────────────
 
 class _MiniCell extends StatelessWidget {
   final int day;
   final bool isToday;
   final bool isSunday;
   final List<StickyNote> notes;
+  final void Function(StickyNote)? onNoteTap; // ← ajouté
+  final VoidCallback? onAddNote; // ← ajouté
 
   const _MiniCell({
     required this.day,
     required this.isToday,
     required this.isSunday,
     required this.notes,
+    this.onNoteTap,
+    this.onAddNote,
   });
 
   @override
@@ -174,19 +198,23 @@ class _MiniCell extends StatelessWidget {
           ),
         ),
 
-        // Post-its empilés sur mini-mois (version compacte)
         if (notes.isNotEmpty)
           Positioned(
             bottom: 0,
             right: 0,
-            child: _StickyStack(notes: notes, isMain: false, onNoteTap: null),
+            child: _StickyStack(
+              notes: notes,
+              isMain: false,
+              onNoteTap: onNoteTap, // ← ajouté
+              onAddNote: onAddNote, // ← ajouté
+            ),
           ),
       ],
     );
   }
 }
 
-// ── Numéro de jour avec cercle "aujourd'hui" ───────────────────────────────
+// ── DayNumber ──────────────────────────────────────────────────────────────
 
 class _DayNumber extends StatelessWidget {
   final int day;
@@ -243,18 +271,34 @@ class _DayNumber extends StatelessWidget {
   }
 }
 
-// ── Stack de post-its chevauchants ─────────────────────────────────────────
+// ── StickyStack ────────────────────────────────────────────────────────────
 
 class _StickyStack extends StatelessWidget {
   final List<StickyNote> notes;
   final bool isMain;
   final void Function(StickyNote)? onNoteTap;
+  final VoidCallback? onAddNote;
 
   const _StickyStack({
     required this.notes,
     required this.isMain,
     this.onNoteTap,
+    this.onAddNote,
   });
+
+  void _showAllNotes(BuildContext context) {
+    // Trouve la date depuis la première note
+    final date = notes.first.date;
+    showDialog(
+      context: context,
+      builder: (_) => NoteStackDialog(
+        notes: notes,
+        date: date,
+        onNoteTap: onNoteTap,
+        onAddNote: onAddNote,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -272,7 +316,6 @@ class _StickyStack extends StatelessWidget {
     final offsetX = AppDimensions.stickyStackOffsetX;
     final offsetY = AppDimensions.stickyStackOffsetY;
 
-    // Largeur totale du stack = noteW + (n-1) * offsetX
     final stackW = noteW + (visibleNotes.length - 1) * offsetX;
     final stackH = noteH + (visibleNotes.length - 1) * offsetY;
 
@@ -282,7 +325,6 @@ class _StickyStack extends StatelessWidget {
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          // Post-its du bas vers le haut (le 1er est en dessous)
           ...List.generate(visibleNotes.length, (i) {
             final note = visibleNotes[visibleNotes.length - 1 - i];
             final revI = visibleNotes.length - 1 - i;
@@ -291,7 +333,9 @@ class _StickyStack extends StatelessWidget {
               left: revI * offsetX,
               top: revI * offsetY,
               child: GestureDetector(
-                onTap: onNoteTap != null ? () => onNoteTap!(note) : null,
+                // ← Tap sur le stack = afficher TOUTES les notes
+                onTap: () => _showAllNotes(context),
+                behavior: HitTestBehavior.opaque,
                 child: StickyNoteWidget(
                   note: note,
                   width: noteW,
@@ -302,7 +346,6 @@ class _StickyStack extends StatelessWidget {
             );
           }),
 
-          // Badge "+N" si plus de maxVisible notes
           if (extraCount > 0)
             Positioned(
               top: -AppDimensions.noteBadgeSize / 2,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../models/month_data.dart';
+import '../../models/sticky_note.dart'; // ← import manquant
 import 'month_header.dart';
 import 'day_cell.dart';
 
@@ -9,12 +10,14 @@ class MonthMiniWidget extends StatelessWidget {
   final MonthData month;
   final bool isCurrent;
   final void Function(DateTime date)? onDayTap;
+  final void Function(StickyNote note)? onNoteTap;
 
   const MonthMiniWidget({
     super.key,
     required this.month,
     this.isCurrent = false,
     this.onDayTap,
+    this.onNoteTap,
   });
 
   @override
@@ -35,23 +38,21 @@ class MonthMiniWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // ── Titre du mois ──────────────────────────────────────────────
           Text(
             month.monthName,
             style: AppTextStyles.monthMiniTitle,
             textAlign: TextAlign.center,
           ),
-
           const SizedBox(height: 1),
-
-          // ── En-tête jours S M T W T F S ───────────────────────────────
           const MonthHeader(isMain: false),
-
           const SizedBox(height: 1),
-
-          // ── Grille des jours ───────────────────────────────────────────
           Expanded(
-            child: _MiniGrid(month: month, today: now, onDayTap: onDayTap),
+            child: _MiniGrid(
+              month: month,
+              today: now,
+              onDayTap: onDayTap,
+              onNoteTap: onNoteTap, // ← passé ici
+            ),
           ),
         ],
       ),
@@ -63,8 +64,14 @@ class _MiniGrid extends StatelessWidget {
   final MonthData month;
   final DateTime today;
   final void Function(DateTime)? onDayTap;
+  final void Function(StickyNote)? onNoteTap; // ← ajouté
 
-  const _MiniGrid({required this.month, required this.today, this.onDayTap});
+  const _MiniGrid({
+    required this.month,
+    required this.today,
+    this.onDayTap,
+    this.onNoteTap, // ← ajouté
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -93,6 +100,7 @@ class _MiniGrid extends StatelessWidget {
                   notes: month.notesForDay(day),
                   events: month.eventsForDay(day),
                   onTap: onDayTap != null ? () => onDayTap!(date) : null,
+                  onNoteTap: onNoteTap, // ← passé ici
                 ),
               );
             }),

@@ -55,6 +55,7 @@ class _BoardScreenState extends State<BoardScreen> {
                           month: month,
                           isCurrent: isCurrent,
                           onDayTap: _onDayTap,
+                          onNoteTap: _onNoteTap,
                         ),
 
                         mainMonthBuilder: (month) => MonthMainWidget(
