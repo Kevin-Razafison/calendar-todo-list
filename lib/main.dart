@@ -5,25 +5,22 @@ import 'app.dart';
 import 'providers/notes_provider.dart';
 import 'providers/calendar_provider.dart';
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Orientation portrait uniquement (tableau mieux en portrait)
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-
-  // Barre de statut transparente
-  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-    statusBarColor: Colors.transparent,
-    statusBarIconBrightness: Brightness.light,
-  ));
-
-  // Init providers
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.light,
+    ),
+  );
   final notesProvider = NotesProvider();
   await notesProvider.loadAll();
-
   runApp(
     MultiProvider(
       providers: [
@@ -32,7 +29,7 @@ void main() async {
           create: (_) => CalendarProvider(notesProvider: notesProvider),
         ),
       ],
-      child: const CalendarBoardApp(),
+      child: CalendarBoardApp(navigatorKey: navigatorKey),
     ),
   );
 }

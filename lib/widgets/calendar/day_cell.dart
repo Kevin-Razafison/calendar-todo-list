@@ -7,10 +7,10 @@ import '../../models/calendar_event.dart';
 import '../notes/sticky_note_widget.dart';
 
 class DayCell extends StatelessWidget {
-  final int? day;             // null = cellule vide
+  final int? day; // null = cellule vide
   final bool isToday;
   final bool isSunday;
-  final bool isMain;          // true = mois central
+  final bool isMain; // true = mois central
   final List<StickyNote> notes;
   final List<CalendarEvent> events;
   final VoidCallback? onTap;
@@ -30,29 +30,41 @@ class DayCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('DayCell $day, onTap is ${onTap != null ? 'non-null' : 'null'}');
     if (day == null) return const SizedBox.shrink();
 
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: AppColors.boardGrid.withOpacity(0.5),
-            width: 0.5,
+    return Listener(
+      onPointerDown: (event) {
+        print('👆 Pointer down on day $day');
+      },
+      child: GestureDetector(
+        onTap: () {
+          print('🔥 DayCell tapped for day $day');
+          if (onTap != null) onTap!();
+        },
+        behavior: HitTestBehavior.opaque, // ← AJOUTE ÇA
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: AppColors.boardGrid.withValues(alpha: 0.5),
+              width: 0.5,
+            ),
           ),
-        ),
-        child: isMain ? _MainCell(
-          day: day!,
-          isToday: isToday,
-          isSunday: isSunday,
-          notes: notes,
-          events: events,
-          onNoteTap: onNoteTap,
-        ) : _MiniCell(
-          day: day!,
-          isToday: isToday,
-          isSunday: isSunday,
-          notes: notes,
+          child: isMain
+              ? _MainCell(
+                  day: day!,
+                  isToday: isToday,
+                  isSunday: isSunday,
+                  notes: notes,
+                  events: events,
+                  onNoteTap: onNoteTap,
+                )
+              : _MiniCell(
+                  day: day!,
+                  isToday: isToday,
+                  isSunday: isSunday,
+                  notes: notes,
+                ),
         ),
       ),
     );
@@ -103,12 +115,17 @@ class _MainCell extends StatelessWidget {
             right: 2,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: events.take(2).map((e) => Text(
-                e.displayLabel,
-                style: AppTextStyles.stickyNoteMini.copyWith(fontSize: 8),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              )).toList(),
+              children: events
+                  .take(2)
+                  .map(
+                    (e) => Text(
+                      e.displayLabel,
+                      style: AppTextStyles.stickyNoteMini.copyWith(fontSize: 8),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  )
+                  .toList(),
             ),
           ),
 
@@ -162,11 +179,7 @@ class _MiniCell extends StatelessWidget {
           Positioned(
             bottom: 0,
             right: 0,
-            child: _StickyStack(
-              notes: notes,
-              isMain: false,
-              onNoteTap: null,
-            ),
+            child: _StickyStack(notes: notes, isMain: false, onNoteTap: null),
           ),
       ],
     );
@@ -218,16 +231,14 @@ class _DayNumber extends StatelessWidget {
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.todayAccent.withOpacity(0.4),
+                  color: AppColors.todayAccent.withValues(alpha: 0.4),
                   blurRadius: 4,
                   spreadRadius: 1,
                 ),
               ],
             )
           : null,
-      child: Center(
-        child: Text('$day', style: style),
-      ),
+      child: Center(child: Text('$day', style: style)),
     );
   }
 }
@@ -318,10 +329,7 @@ class _ExtraBadge extends StatelessWidget {
         shape: BoxShape.circle,
         border: Border.all(color: Colors.white, width: 1),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: 3,
-          ),
+          BoxShadow(color: Colors.black.withValues(alpha: 0.3), blurRadius: 3),
         ],
       ),
       child: Center(

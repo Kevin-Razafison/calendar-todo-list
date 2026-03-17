@@ -1,9 +1,11 @@
 import 'sticky_note.dart';
 import 'calendar_event.dart';
 
+/// Contient toutes les données d'un mois :
+/// les semaines (grille), les post-its et les événements associés.
 class MonthData {
   final int year;
-  final int month;
+  final int month; // 1 = Janvier … 12 = Décembre
 
   final List<StickyNote> notes;
   final List<CalendarEvent> events;
@@ -11,38 +13,46 @@ class MonthData {
   MonthData({
     required this.year,
     required this.month,
-    List<StickyNote> notes,
-    List<CalendarEvent> events;
+    List<StickyNote>? notes,
+    List<CalendarEvent>? events,
   }) : notes = notes ?? [],
        events = events ?? [];
 
-
-  //Infos de base
+  // ── Infos de base ────────────────────────────────────────────────────────
 
   String get monthName {
     const names = [
-      '', 'JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST',
-      'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER',
+      '',
+      'JANUARY',
+      'FEBRUARY',
+      'MARCH',
+      'APRIL',
+      'MAY',
+      'JUNE',
+      'JULY',
+      'AUGUST',
+      'SEPTEMBER',
+      'OCTOBER',
+      'NOVEMBER',
+      'DECEMBER',
     ];
-    return names [month];
+    return names[month];
   }
 
-  
   String get shortMonthName => monthName.substring(0, 3);
-  
-  
-  //Nombre de jours dans ce mois
+
+  /// Nombre de jours dans ce mois
   int get daysInMonth => DateTime(year, month + 1, 0).day;
 
-  ///jour de la semaine du 1er (0 = dimanche, 6 = Samedi)
+  /// Jour de la semaine du 1er (0 = Dimanche, 6 = Samedi)
   int get firstWeekday {
-    final d = DateTime(year, month, 1).weekday;
-    return d % 7;
+    final d = DateTime(year, month, 1).weekday; // 1=Lundi … 7=Dimanche
+    return d % 7; // Convertit en 0=Dimanche … 6=Samedi
   }
 
-  // Grille calendrier
+  // ── Grille calendrier ────────────────────────────────────────────────────
 
-  //Retourne une grille de 6 semaines x 7 jours,
+  /// Retourne une grille de 6 semaines × 7 jours.
   /// Null = case vide (avant le 1er ou après le dernier jour).
   List<List<int?>> get weeksGrid {
     final grid = <List<int?>>[];
@@ -53,44 +63,55 @@ class MonthData {
       final row = <int?>[];
       for (var dow = 0; dow < 7; dow++) {
         final cellIndex = week * 7 + dow;
-        if(cellIndex < offset || currentDay > daysInMonth) {
+        if (cellIndex < offset || currentDay > daysInMonth) {
           row.add(null);
         } else {
           row.add(currentDay++);
         }
       }
-      if (row.any((d) => d != null)) grid .add(row);
+      // Ne pas ajouter de semaine complètement vide à la fin
+      if (row.any((d) => d != null)) grid.add(row);
     }
     return grid;
   }
 
+  // ── Accesseurs filtrés ───────────────────────────────────────────────────
+
+  /// Post-its pour un jour donné
   List<StickyNote> notesForDay(int day) {
     final target = DateTime(year, month, day);
-    return notes.where((n) =>
-      n.date.year == target.year &&
-      n.date.month == target.month &&
-      n.date.day == target.day,
-    ).toList();
+    return notes
+        .where(
+          (n) =>
+              n.date.year == target.year &&
+              n.date.month == target.month &&
+              n.date.day == target.day,
+        )
+        .toList();
   }
 
+  /// Événements pour un jour donné
   List<CalendarEvent> eventsForDay(int day) {
     final target = DateTime(year, month, day);
-    return events.where((e) =>
-      e.date.year == target.year &&
-      e.date.month == target.month &&
-      e.date.day == target.day,
-    ).toList();
+    return events
+        .where(
+          (e) =>
+              e.date.year == target.year &&
+              e.date.month == target.month &&
+              e.date.day == target.day,
+        )
+        .toList();
   }
 
+  /// Vrai si ce mois est le mois courant
   bool get isCurrentMonth {
     final now = DateTime.now();
     return year == now.year && month == now.month;
   }
 
-  MonthData copyWith({
-    List<StickyNote>? notes,
-    List<CalendarEvent>? events,
-  }) {
+  // ── CopyWith & sérialisation ─────────────────────────────────────────────
+
+  MonthData copyWith({List<StickyNote>? notes, List<CalendarEvent>? events}) {
     return MonthData(
       year: year,
       month: month,
@@ -99,16 +120,14 @@ class MonthData {
     );
   }
 
-  MonthData addNote(StickyNote note) =>
-    copyWith(notes : [...notes, note]);
-
+  MonthData addNote(StickyNote note) => copyWith(notes: [...notes, note]);
 
   MonthData removeNote(String noteId) =>
-    copyWith(notes: notes.where((n) => n.id != noteId).toList());
+      copyWith(notes: notes.where((n) => n.id != noteId).toList());
 
   MonthData updateNote(StickyNote updated) => copyWith(
     notes: notes.map((n) => n.id == updated.id ? updated : n).toList(),
-    );
+  );
 
   @override
   String toString() => 'MonthData($monthName $year, ${notes.length} notes)';

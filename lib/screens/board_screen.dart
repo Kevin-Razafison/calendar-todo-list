@@ -12,18 +12,24 @@ import '../widgets/calendar/month_main_widget.dart';
 import '../widgets/notes/quick_notes_bar.dart';
 import '../widgets/notes/add_note_dialog.dart';
 import '../widgets/notes/add_quick_note_dialog.dart';
+import '../main.dart';
 
-class BoardScreen extends StatelessWidget {
+class BoardScreen extends StatefulWidget {
   const BoardScreen({super.key});
 
   @override
+  State<BoardScreen> createState() => _BoardScreenState();
+}
+
+class _BoardScreenState extends State<BoardScreen> {
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1A0F08), // mur sombre derrière le tableau
+      backgroundColor: const Color(0xFF1A0F08),
       body: SafeArea(
-        child: Consumer<CalendarProvider>(
-          builder: (context, calProv, _) {
-            if (!context.read<NotesProvider>().isLoaded) {
+        child: Consumer2<CalendarProvider, NotesProvider>(
+          builder: (context, calProv, notesProv, _) {
+            if (!notesProv.isLoaded) {
               return const Center(
                 child: CircularProgressIndicator(color: AppColors.stickyYellow),
               );
@@ -31,15 +37,12 @@ class BoardScreen extends StatelessWidget {
 
             return Column(
               children: [
-                // ── Barre de navigation année ────────────────────────────
                 _YearNavBar(
                   year: calProv.displayYear,
                   onPrev: calProv.goToPreviousYear,
                   onNext: calProv.goToNextYear,
                   onToday: calProv.goToToday,
                 ),
-
-                // ── Tableau principal ────────────────────────────────────
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(10, 4, 10, 10),
@@ -48,27 +51,24 @@ class BoardScreen extends StatelessWidget {
                         months: calProv.months,
                         currentMonthIndex: calProv.centralMonthIndex,
 
-                        // ── Mini mois ──────────────────────────────────
                         miniMonthBuilder: (month, isCurrent) => MonthMiniWidget(
                           month: month,
                           isCurrent: isCurrent,
-                          onDayTap: (date) => _onDayTap(context, date),
+                          onDayTap: _onDayTap,
                         ),
 
-                        // ── Mois central ───────────────────────────────
                         mainMonthBuilder: (month) => MonthMainWidget(
                           month: month,
-                          onDayTap: (date) => _onDayTap(context, date),
-                          onNoteTap: (note) => _onNoteTap(context, note),
+                          onDayTap: _onDayTap,
+                          onNoteTap: _onNoteTap,
                         ),
 
-                        // ── Quick notes bar ────────────────────────────
                         quickNotesBar: Consumer<NotesProvider>(
-                          builder: (context, notesProv, _) => QuickNotesBar(
+                          builder: (ctx, notesProv, _) => QuickNotesBar(
                             notes: notesProv.quickNotes,
-                            onAddNote: () => _onAddQuickNote(context),
-                            onNoteTap: (note) => _onQuickNoteTap(context, note),
-                            onNoteLongPress: (note) => _onQuickNoteLongPress(context, note),
+                            onAddNote: _onAddQuickNote,
+                            onNoteTap: _onQuickNoteTap,
+                            onNoteLongPress: _onQuickNoteLongPress,
                           ),
                         ),
                       ),
@@ -85,86 +85,82 @@ class BoardScreen extends StatelessWidget {
 
   // ── Handlers ─────────────────────────────────────────────────────────────
 
-  Future<void> _onDayTap(BuildContext context, DateTime date) async {
+  Future<void> _onDayTap(DateTime date) async {
+    final ctx = navigatorKey.currentContext;
+    if (ctx == null) return;
     final result = await showDialog<dynamic>(
-      context: context,
+      context: ctx,
       builder: (_) => AddNoteDialog(date: date),
     );
-
     if (result == null || result is! StickyNote) return;
-    if (!context.mounted) return;
-    await context.read<CalendarProvider>().addNote(
+    if (!mounted) return;
+    context.read<CalendarProvider>().addNote(
       date: result.date,
       text: result.text,
       color: result.color,
     );
   }
 
-  Future<void> _onNoteTap(BuildContext context, StickyNote note) async {
+  Future<void> _onNoteTap(StickyNote note) async {
+    final ctx = navigatorKey.currentContext;
+    if (ctx == null) return;
     final result = await showDialog<dynamic>(
-      context: context,
-      builder: (_) => AddNoteDialog(
-        date: note.date,
-        existingNote: note,
-      ),
+      context: ctx,
+      builder: (_) => AddNoteDialog(date: note.date, existingNote: note),
     );
-
-    if (!context.mounted) return;
+    if (!mounted) return;
     if (result == 'delete') {
-      await context.read<CalendarProvider>().deleteNote(note.id);
+      context.read<CalendarProvider>().deleteNote(note.id);
     } else if (result is StickyNote) {
-      await context.read<CalendarProvider>().updateNote(result);
+      context.read<CalendarProvider>().updateNote(result);
     }
   }
 
-  Future<void> _onAddQuickNote(BuildContext context) async {
+  Future<void> _onAddQuickNote() async {
+    final ctx = navigatorKey.currentContext;
+    if (ctx == null) return;
     final result = await showDialog<dynamic>(
-      context: context,
+      context: ctx,
       builder: (_) => const AddQuickNoteDialog(),
     );
-
     if (result == null || result is! QuickNote) return;
-    if (!context.mounted) return;
-    await context.read<NotesProvider>().addQuickNote(result);
+    if (!mounted) return;
+    context.read<NotesProvider>().addQuickNote(result);
   }
 
-  Future<void> _onQuickNoteTap(BuildContext context, QuickNote note) async {
+  Future<void> _onQuickNoteTap(QuickNote note) async {
+    final ctx = navigatorKey.currentContext;
+    if (ctx == null) return;
     final result = await showDialog<dynamic>(
-      context: context,
+      context: ctx,
       builder: (_) => AddQuickNoteDialog(existingNote: note),
     );
-
-    if (!context.mounted) return;
+    if (!mounted) return;
     if (result == 'delete') {
-      await context.read<NotesProvider>().deleteQuickNote(note.id);
+      context.read<NotesProvider>().deleteQuickNote(note.id);
     } else if (result is QuickNote) {
-      await context.read<NotesProvider>().updateQuickNote(result);
+      context.read<NotesProvider>().updateQuickNote(result);
     }
   }
 
-  Future<void> _onQuickNoteLongPress(BuildContext context, QuickNote note) async {
-    // Long press → picker de date pour lier/délier la note
+  Future<void> _onQuickNoteLongPress(QuickNote note) async {
+    final ctx = navigatorKey.currentContext;
+    if (ctx == null) return;
     final picked = await showDatePicker(
-      context: context,
+      context: ctx,
       initialDate: note.linkedDate ?? DateTime.now(),
       firstDate: DateTime(DateTime.now().year - 1),
       lastDate: DateTime(DateTime.now().year + 2),
-      helpText: note.linkedDate == null
-          ? 'Link note to a date'
-          : 'Change linked date',
       builder: (context, child) => Theme(
         data: Theme.of(context).copyWith(
-          colorScheme: ColorScheme.light(
-            primary: AppColors.woodMedium,
-          ),
+          colorScheme: ColorScheme.light(primary: AppColors.woodMedium),
         ),
         child: child!,
       ),
     );
-
-    if (!context.mounted) return;
+    if (!mounted) return;
     if (picked != null) {
-      await context.read<NotesProvider>().linkQuickNoteToDate(note.id, picked);
+      context.read<NotesProvider>().linkQuickNoteToDate(note.id, picked);
     }
   }
 }
@@ -191,10 +187,7 @@ class _YearNavBar extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Année précédente
           _NavButton(icon: Icons.chevron_left, onTap: onPrev),
-
-          // Année + bouton Today
           Row(
             children: [
               Text(
@@ -210,12 +203,15 @@ class _YearNavBar extends StatelessWidget {
               GestureDetector(
                 onTap: onToday,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
-                    color: AppColors.stickyYellow.withOpacity(0.15),
+                    color: AppColors.stickyYellow.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: AppColors.stickyYellow.withOpacity(0.4),
+                      color: AppColors.stickyYellow.withValues(alpha: 0.4),
                     ),
                   ),
                   child: const Text(
@@ -231,8 +227,6 @@ class _YearNavBar extends StatelessWidget {
               ),
             ],
           ),
-
-          // Année suivante
           _NavButton(icon: Icons.chevron_right, onTap: onNext),
         ],
       ),
@@ -254,11 +248,9 @@ class _NavButton extends StatelessWidget {
         width: 32,
         height: 32,
         decoration: BoxDecoration(
-          color: AppColors.woodMedium.withOpacity(0.4),
+          color: AppColors.woodMedium.withValues(alpha: 0.4),
           shape: BoxShape.circle,
-          border: Border.all(
-            color: AppColors.woodLight.withOpacity(0.5),
-          ),
+          border: Border.all(color: AppColors.woodLight.withValues(alpha: 0.5)),
         ),
         child: Icon(icon, color: AppColors.stickyYellow, size: 20),
       ),

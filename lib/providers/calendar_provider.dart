@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import '../models/month_data.dart';
 import '../models/sticky_note.dart';
-import '../models/calendar_event.dart';
 import '../core/utils/calendar_helpers.dart';
 import 'notes_provider.dart';
 
@@ -20,10 +19,10 @@ class CalendarProvider extends ChangeNotifier {
     required NotesProvider notesProvider,
     int? initialYear,
     int? initialMonthIndex,
-  })  : _notesProvider = notesProvider,
-        _displayYear = initialYear ?? DateTime.now().year,
-        _centralMonthIndex =
-            initialMonthIndex ?? CalendarHelpers.currentMonthIndex {
+  }) : _notesProvider = notesProvider,
+       _displayYear = initialYear ?? DateTime.now().year,
+       _centralMonthIndex =
+           initialMonthIndex ?? CalendarHelpers.currentMonthIndex {
     _rebuildMonths();
     // Se re-construit quand les notes changent
     _notesProvider.addListener(_onNotesChanged);

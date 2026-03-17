@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
-import '../../core/constants/app_dimensions.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../models/month_data.dart';
 import 'month_header.dart';
@@ -27,7 +26,7 @@ class MonthMiniWidget extends StatelessWidget {
       decoration: isCurrent
           ? BoxDecoration(
               border: Border.all(
-                color: AppColors.todayAccent.withOpacity(0.4),
+                color: AppColors.todayAccent.withValues(alpha: 0.4),
                 width: 1,
               ),
               borderRadius: BorderRadius.circular(2),
@@ -52,11 +51,7 @@ class MonthMiniWidget extends StatelessWidget {
 
           // ── Grille des jours ───────────────────────────────────────────
           Expanded(
-            child: _MiniGrid(
-              month: month,
-              today: now,
-              onDayTap: onDayTap,
-            ),
+            child: _MiniGrid(month: month, today: now, onDayTap: onDayTap),
           ),
         ],
       ),
@@ -69,11 +64,7 @@ class _MiniGrid extends StatelessWidget {
   final DateTime today;
   final void Function(DateTime)? onDayTap;
 
-  const _MiniGrid({
-    required this.month,
-    required this.today,
-    this.onDayTap,
-  });
+  const _MiniGrid({required this.month, required this.today, this.onDayTap});
 
   @override
   Widget build(BuildContext context) {
@@ -88,7 +79,8 @@ class _MiniGrid extends StatelessWidget {
               if (day == null) return const Expanded(child: SizedBox());
 
               final date = DateTime(month.year, month.month, day);
-              final isToday = date.year == today.year &&
+              final isToday =
+                  date.year == today.year &&
                   date.month == today.month &&
                   date.day == today.day;
 
@@ -100,9 +92,7 @@ class _MiniGrid extends StatelessWidget {
                   isMain: false,
                   notes: month.notesForDay(day),
                   events: month.eventsForDay(day),
-                  onTap: onDayTap != null
-                      ? () => onDayTap!(date)
-                      : null,
+                  onTap: onDayTap != null ? () => onDayTap!(date) : null,
                 ),
               );
             }),

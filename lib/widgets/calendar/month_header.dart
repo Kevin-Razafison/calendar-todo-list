@@ -17,14 +17,15 @@ class MonthHeader extends StatelessWidget {
           child: Center(
             child: Text(
               kDayHeaders[i],
-              style: (isMain
-                      ? AppTextStyles.monthMainDayHeader
-                      : AppTextStyles.monthMiniDayHeader)
-                  .copyWith(
-                color: isWeekend
-                    ? AppColors.sundayRed.withOpacity(0.7)
-                    : null,
-              ),
+              style:
+                  (isMain
+                          ? AppTextStyles.monthMainDayHeader
+                          : AppTextStyles.monthMiniDayHeader)
+                      .copyWith(
+                        color: isWeekend
+                            ? AppColors.sundayRed.withValues(alpha: 0.7)
+                            : null,
+                      ),
             ),
           ),
         );

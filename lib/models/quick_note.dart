@@ -18,9 +18,9 @@ class QuickNote {
     double? rotationAngle,
     DateTime? createdAt,
     this.updatedAt,
-  })  : id = id ?? const Uuid().v4(),
-        rotationAngle = rotationAngle ?? _randomAngle(),
-        createdAt = createdAt ?? DateTime.now();
+  }) : id = id ?? const Uuid().v4(),
+       rotationAngle = rotationAngle ?? _randomAngle(),
+       createdAt = createdAt ?? DateTime.now();
 
   static double _randomAngle() {
     return (DateTime.now().millisecondsSinceEpoch % 14 - 7) / 100.0;

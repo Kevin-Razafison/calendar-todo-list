@@ -22,9 +22,7 @@ class _AddQuickNoteDialogState extends State<AddQuickNoteDialog> {
   @override
   void initState() {
     super.initState();
-    _controller = TextEditingController(
-      text: widget.existingNote?.text ?? '',
-    );
+    _controller = TextEditingController(text: widget.existingNote?.text ?? '');
     _selectedColor = widget.existingNote?.color ?? StickyNoteColor.yellow;
     _linkedDate = widget.existingNote?.linkedDate;
   }
@@ -67,7 +65,7 @@ class _AddQuickNoteDialogState extends State<AddQuickNoteDialog> {
           borderRadius: BorderRadius.circular(AppDimensions.dialogRadius),
           boxShadow: [
             BoxShadow(
-              color: _selectedColor.shadowColor.withOpacity(0.4),
+              color: _selectedColor.shadowColor.withValues(alpha: 0.4),
               blurRadius: 16,
               offset: const Offset(4, 6),
             ),
@@ -89,8 +87,11 @@ class _AddQuickNoteDialogState extends State<AddQuickNoteDialog> {
                 ),
                 GestureDetector(
                   onTap: () => Navigator.of(context).pop(),
-                  child: Icon(Icons.close, size: 18,
-                      color: AppColors.textOnSticky.withOpacity(0.6)),
+                  child: Icon(
+                    Icons.close,
+                    size: 18,
+                    color: AppColors.textOnSticky.withValues(alpha: 0.6),
+                  ),
                 ),
               ],
             ),
@@ -101,7 +102,7 @@ class _AddQuickNoteDialogState extends State<AddQuickNoteDialog> {
             Container(
               constraints: const BoxConstraints(minHeight: 80, maxHeight: 140),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.25),
+                color: Colors.white.withValues(alpha: 0.25),
                 borderRadius: BorderRadius.circular(2),
               ),
               padding: const EdgeInsets.all(8),
@@ -114,7 +115,7 @@ class _AddQuickNoteDialogState extends State<AddQuickNoteDialog> {
                   border: InputBorder.none,
                   hintText: 'Quick note...',
                   hintStyle: AppTextStyles.dialogInput.copyWith(
-                    color: AppColors.textOnSticky.withOpacity(0.4),
+                    color: AppColors.textOnSticky.withValues(alpha: 0.4),
                   ),
                 ),
               ),
@@ -126,33 +127,43 @@ class _AddQuickNoteDialogState extends State<AddQuickNoteDialog> {
             GestureDetector(
               onTap: _pickDate,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(2),
                   border: Border.all(
-                    color: AppColors.textOnSticky.withOpacity(0.2),
+                    color: AppColors.textOnSticky.withValues(alpha: 0.2),
                   ),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.calendar_today,
-                        size: 13, color: AppColors.textOnSticky.withOpacity(0.7)),
+                    Icon(
+                      Icons.calendar_today,
+                      size: 13,
+                      color: AppColors.textOnSticky.withValues(alpha: 0.7),
+                    ),
                     const SizedBox(width: 6),
                     Text(
                       _linkedDate == null
                           ? 'Link to a date (optional)'
                           : '${_linkedDate!.day}/${_linkedDate!.month}/${_linkedDate!.year}',
-                      style: AppTextStyles.stickyNoteMain.copyWith(fontSize: 12),
+                      style: AppTextStyles.stickyNoteMain.copyWith(
+                        fontSize: 12,
+                      ),
                     ),
                     if (_linkedDate != null) ...[
                       const SizedBox(width: 6),
                       GestureDetector(
                         onTap: () => setState(() => _linkedDate = null),
-                        child: Icon(Icons.close,
-                            size: 13,
-                            color: AppColors.textOnSticky.withOpacity(0.6)),
+                        child: Icon(
+                          Icons.close,
+                          size: 13,
+                          color: AppColors.textOnSticky.withValues(alpha: 0.6),
+                        ),
                       ),
                     ],
                   ],
@@ -172,19 +183,25 @@ class _AddQuickNoteDialogState extends State<AddQuickNoteDialog> {
                     duration: const Duration(milliseconds: 150),
                     width: AppDimensions.colorPickerSize,
                     height: AppDimensions.colorPickerSize,
-                    margin: const EdgeInsets.only(right: AppDimensions.colorPickerSpacing),
+                    margin: const EdgeInsets.only(
+                      right: AppDimensions.colorPickerSpacing,
+                    ),
                     decoration: BoxDecoration(
                       color: color.color,
                       shape: BoxShape.circle,
                       border: Border.all(
                         color: isSelected
                             ? AppColors.textOnSticky
-                            : color.shadowColor.withOpacity(0.5),
+                            : color.shadowColor.withValues(alpha: 0.5),
                         width: isSelected ? 2.5 : 1,
                       ),
                     ),
                     child: isSelected
-                        ? Icon(Icons.check, size: 14, color: AppColors.textOnSticky)
+                        ? Icon(
+                            Icons.check,
+                            size: 14,
+                            color: AppColors.textOnSticky,
+                          )
                         : null,
                   ),
                 );
@@ -201,14 +218,21 @@ class _AddQuickNoteDialogState extends State<AddQuickNoteDialog> {
                   GestureDetector(
                     onTap: () => Navigator.of(context).pop('delete'),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
-                        color: Colors.red.withOpacity(0.15),
+                        color: Colors.red.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(2),
                       ),
-                      child: Text('Delete',
-                          style: AppTextStyles.dialogInput.copyWith(
-                              fontSize: 13, color: Colors.red.shade700)),
+                      child: Text(
+                        'Delete',
+                        style: AppTextStyles.dialogInput.copyWith(
+                          fontSize: 13,
+                          color: Colors.red.shade700,
+                        ),
+                      ),
                     ),
                   ),
                 if (isEdit) const SizedBox(width: 8),
@@ -231,14 +255,21 @@ class _AddQuickNoteDialogState extends State<AddQuickNoteDialog> {
                     Navigator.of(context).pop(note);
                   },
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
-                      color: AppColors.textOnSticky.withOpacity(0.15),
+                      color: AppColors.textOnSticky.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(2),
                     ),
-                    child: Text('Save',
-                        style: AppTextStyles.dialogInput.copyWith(
-                            fontSize: 13, fontWeight: FontWeight.w700)),
+                    child: Text(
+                      'Save',
+                      style: AppTextStyles.dialogInput.copyWith(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                   ),
                 ),
               ],

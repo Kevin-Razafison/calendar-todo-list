@@ -1,17 +1,13 @@
+import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
-enum StickyNoteColor {
-  yellow,
-  green,
-  pink,
-  blue,
-}
+enum StickyNoteColor { yellow, green, pink, blue }
 
-extension StickyNoteColorExtension on StickyNoColor {
+extension StickyNoteColorExtension on StickyNoteColor {
   Color get color {
     switch (this) {
       case StickyNoteColor.yellow:
-        return const Color(0xFFFF176);
+        return const Color(0xFFFFF176); // jaune classique post-it
       case StickyNoteColor.green:
         return const Color(0xFFB9F6CA);
       case StickyNoteColor.pink:
@@ -41,104 +37,106 @@ extension StickyNoteColorExtension on StickyNoColor {
       case StickyNoteColor.green:
         return 'green';
       case StickyNoteColor.pink:
-        return 'pinl';
+        return 'pink';
       case StickyNoteColor.blue:
-        return 'blue";
+        return 'blue';
     }
   }
 
-  static StickyNoteColor fromStrring(String value) {
+  static StickyNoteColor fromString(String value) {
     switch (value) {
       case 'green':
         return StickyNoteColor.green;
-
       case 'pink':
         return StickyNoteColor.pink;
-
       case 'blue':
         return StickyNoteColor.blue;
-
       default:
         return StickyNoteColor.yellow;
     }
   }
 }
 
-  class StickyNote {
-    final String id;
-    final Sting text;
-    final DateTime dte;
-    final StickyNoteColor color;
-    final double rotationAngle;
-    final DateTime createdAt;
-    final DateTime? updateAt;
+class StickyNote {
+  final String id;
+  final String text;
+  final DateTime date; // La date (jour) sur laquelle la note est collée
+  final StickyNoteColor color;
+  final double
+  rotationAngle; // Légère rotation pour l'effet réaliste (-0.1 à 0.1 rad)
+  final DateTime createdAt;
+  final DateTime? updatedAt;
 
-    StickyNote({
-      String? id,
-      required this.text,
-      required this.date,
-      this.color = StickyNoteColor.yellow,
-      double? rotationAngle,
-      DateTime? createdAt,
-      this.updatedAt,
-    }) : id = id ?? const Uuid().v4(),
-          rotationAngle = rotationAngle ?? _randomAngle(),
-          createdAt = createdAt ?? DateTime.now();
+  StickyNote({
+    String? id,
+    required this.text,
+    required this.date,
+    this.color = StickyNoteColor.yellow,
+    double? rotationAngle,
+    DateTime? createdAt,
+    this.updatedAt,
+  }) : id = id ?? const Uuid().v4(),
+       rotationAngle = rotationAngle ?? _randomAngle(),
+       createdAt = createdAt ?? DateTime.now();
 
-    static double _randomAngle(){
-      return (DateTime.now().millisecondsSinceEpoch % 17 -8)/ 100.0;
-    }
+  /// Génère un angle de rotation légèrement aléatoire mais déterministe selon l'id
+  static double _randomAngle() {
+    // Entre -0.08 et +0.08 radians (~5°)
+    return (DateTime.now().millisecondsSinceEpoch % 17 - 8) / 100.0;
+  }
 
-    StickyNote copyWith({
-      String? text,
-      DateTIme? date,
-      StickyNoteColor? color,
-      double? rotationAngle,
-    }) {
-      return StickyNote(
-        id: id,
-        text: text ?? this.text,
-        date: date ?? this.date,
-        color: color ?? this.color,
-        rotationAngle: roationAngle ?? this.rotationAngle,
-        createAt: createdAt,
-        updatedAt: DateTime.now(),
-      );
-    }
+  StickyNote copyWith({
+    String? text,
+    DateTime? date,
+    StickyNoteColor? color,
+    double? rotationAngle,
+  }) {
+    return StickyNote(
+      id: id,
+      text: text ?? this.text,
+      date: date ?? this.date,
+      color: color ?? this.color,
+      rotationAngle: rotationAngle ?? this.rotationAngle,
+      createdAt: createdAt,
+      updatedAt: DateTime.now(),
+    );
+  }
 
-    Map<String, dynamic> toMap() {
-      return {
-        'id': id,
-        'text': text,
-        'date': date.toIso8601String(),
-        'color': color.name,
-        'rotationAngle':rotationAngle,
-        'createdAt': createdAt.toIso8601String(),
-        'updatedAt':updatedAt?.toIso8601String(),
-      };
-    }
+  // ── Sérialisation Hive/JSON ──────────────────────────────────────────────
 
-    factory StickyNote.fromMap(Map<String, dynamic> map) {
-      return StickyNote(
-        id: map['id'] as String,
-        text: map['text'] as String,
-        date: DateTime.parse(map['date'] as String),
-        color: StickyNoteColorExtension.formString(map['color'] as String),
-        rorationAngle:(map ['rotationAngle'] as num).toDouble(),
-        createdAt: DateTime.parse(map['createdAt'] as String),
-        updatedAt: map['updatedAt'] != null
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'text': text,
+      'date': date.toIso8601String(),
+      'color': color.name,
+      'rotationAngle': rotationAngle,
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt?.toIso8601String(),
+    };
+  }
+
+  factory StickyNote.fromMap(Map<String, dynamic> map) {
+    return StickyNote(
+      id: map['id'] as String,
+      text: map['text'] as String,
+      date: DateTime.parse(map['date'] as String),
+      color: StickyNoteColorExtension.fromString(map['color'] as String),
+      rotationAngle: (map['rotationAngle'] as num).toDouble(),
+      createdAt: DateTime.parse(map['createdAt'] as String),
+      updatedAt: map['updatedAt'] != null
           ? DateTime.parse(map['updatedAt'] as String)
           : null,
-      );
-    }
+    );
+  }
 
-    @override
-    bool operator ==(Object other) => other is StickyNote && other.id == id;
+  @override
+  bool operator ==(Object other) => other is StickyNote && other.id == id;
 
-    @override
-    int get hashCode => id.hashCode;
+  @override
+  int get hashCode => id.hashCode;
 
-    @override
-    String toString() =>
-      'StickyNote(id: $id, date: $date, text: "${text.substring(0, text.length.clamp(0,20))..."}';
+  @override
+  String toString() =>
+      'StickyNote(id: $id, date: $date, text: "${text.substring(0, text.length.clamp(0, 20))}...")';
 }

@@ -8,11 +8,7 @@ class AddNoteDialog extends StatefulWidget {
   final DateTime date;
   final StickyNote? existingNote; // null = création, non-null = édition
 
-  const AddNoteDialog({
-    super.key,
-    required this.date,
-    this.existingNote,
-  });
+  const AddNoteDialog({super.key, required this.date, this.existingNote});
 
   @override
   State<AddNoteDialog> createState() => _AddNoteDialogState();
@@ -25,9 +21,7 @@ class _AddNoteDialogState extends State<AddNoteDialog> {
   @override
   void initState() {
     super.initState();
-    _controller = TextEditingController(
-      text: widget.existingNote?.text ?? '',
-    );
+    _controller = TextEditingController(text: widget.existingNote?.text ?? '');
     _selectedColor = widget.existingNote?.color ?? StickyNoteColor.yellow;
   }
 
@@ -39,8 +33,20 @@ class _AddNoteDialogState extends State<AddNoteDialog> {
 
   String get _formattedDate {
     final d = widget.date;
-    const months = ['Jan','Feb','Mar','Apr','May','Jun',
-                    'Jul','Aug','Sep','Oct','Nov','Dec'];
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     return '${months[d.month - 1]} ${d.day}, ${d.year}';
   }
 
@@ -57,7 +63,7 @@ class _AddNoteDialogState extends State<AddNoteDialog> {
           borderRadius: BorderRadius.circular(AppDimensions.dialogRadius),
           boxShadow: [
             BoxShadow(
-              color: _selectedColor.shadowColor.withOpacity(0.4),
+              color: _selectedColor.shadowColor.withValues(alpha: 0.4),
               blurRadius: 16,
               offset: const Offset(4, 6),
             ),
@@ -82,7 +88,7 @@ class _AddNoteDialogState extends State<AddNoteDialog> {
                   child: Icon(
                     Icons.close,
                     size: 18,
-                    color: AppColors.textOnSticky.withOpacity(0.6),
+                    color: AppColors.textOnSticky.withValues(alpha: 0.6),
                   ),
                 ),
               ],
@@ -94,7 +100,7 @@ class _AddNoteDialogState extends State<AddNoteDialog> {
             Container(
               constraints: const BoxConstraints(minHeight: 100, maxHeight: 160),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.25),
+                color: Colors.white.withValues(alpha: 0.25),
                 borderRadius: BorderRadius.circular(2),
               ),
               padding: const EdgeInsets.all(8),
@@ -107,7 +113,7 @@ class _AddNoteDialogState extends State<AddNoteDialog> {
                   border: InputBorder.none,
                   hintText: 'Write your note...',
                   hintStyle: AppTextStyles.dialogInput.copyWith(
-                    color: AppColors.textOnSticky.withOpacity(0.4),
+                    color: AppColors.textOnSticky.withValues(alpha: 0.4),
                   ),
                 ),
               ),
@@ -134,15 +140,15 @@ class _AddNoteDialogState extends State<AddNoteDialog> {
                       border: Border.all(
                         color: isSelected
                             ? AppColors.textOnSticky
-                            : color.shadowColor.withOpacity(0.5),
+                            : color.shadowColor.withValues(alpha: 0.5),
                         width: isSelected ? 2.5 : 1,
                       ),
                       boxShadow: isSelected
                           ? [
                               BoxShadow(
-                                color: color.shadowColor.withOpacity(0.5),
+                                color: color.shadowColor.withValues(alpha: 0.5),
                                 blurRadius: 6,
-                              )
+                              ),
                             ]
                           : null,
                     ),
@@ -170,10 +176,11 @@ class _AddNoteDialogState extends State<AddNoteDialog> {
                     onTap: () => Navigator.of(context).pop('delete'),
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 6,
+                        horizontal: 12,
+                        vertical: 6,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.red.withOpacity(0.15),
+                        color: Colors.red.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(2),
                       ),
                       child: Text(
@@ -213,10 +220,11 @@ class _AddNoteDialogState extends State<AddNoteDialog> {
                   },
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 6,
+                      horizontal: 16,
+                      vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.textOnSticky.withOpacity(0.15),
+                      color: AppColors.textOnSticky.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(2),
                     ),
                     child: Text(

@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
 
-
+/// Toutes les tailles sont relatives — on utilisera
+/// un facteur d'échelle dans les widgets si besoin.
 class AppTextStyles {
   AppTextStyles._();
 
-  //Police manuscrite (posts-its)
+  // ── Police manuscrite (post-its) ─────────────────────────────────────────
+  // Remplacer 'Caveat' par la police de votre choix dans pubspec.yaml
   static const String _handwrittenFont = 'Caveat';
-  static const String _boardFont       = 'Roboto';
+  static const String _boardFont = 'Roboto';
 
-
-  //Mois central
+  // ── Mois central (grand) ─────────────────────────────────────────────────
   static const TextStyle monthMainTitle = TextStyle(
     fontFamily: _boardFont,
     fontSize: 22,
@@ -27,30 +28,29 @@ class AppTextStyles {
     letterSpacing: 1.5,
   );
 
-  static const TextStyle monthMainDayNumber = TextStyle (
+  static const TextStyle monthMainDayNumber = TextStyle(
     fontFamily: _boardFont,
     fontSize: 13,
     fontWeight: FontWeight.w500,
     color: AppColors.textDark,
   );
 
-  static const TextStyle monthMainDayNumberToday = TextStyle (
+  static const TextStyle monthMainDayNumberToday = TextStyle(
     fontFamily: _boardFont,
     fontSize: 13,
     fontWeight: FontWeight.w700,
     color: Colors.white,
   );
 
-  static const TextStyle monthMainDayNumbearSunday = TextStyle (
+  static const TextStyle monthMainDayNumberSunday = TextStyle(
     fontFamily: _boardFont,
     fontSize: 13,
     fontWeight: FontWeight.w500,
     color: AppColors.sundayRed,
   );
 
-  //Mois mini
-  
-  static const TextStyle monthMiniTitle = TextStyle (
+  // ── Mois mini (périphériques) ────────────────────────────────────────────
+  static const TextStyle monthMiniTitle = TextStyle(
     fontFamily: _boardFont,
     fontSize: 9,
     fontWeight: FontWeight.w800,
@@ -58,8 +58,7 @@ class AppTextStyles {
     color: AppColors.textDark,
   );
 
-  
-  static const TextStyle monthMiniDayHeaderr = TextStyle (
+  static const TextStyle monthMiniDayHeader = TextStyle(
     fontFamily: _boardFont,
     fontSize: 7,
     fontWeight: FontWeight.w600,
@@ -67,32 +66,30 @@ class AppTextStyles {
     letterSpacing: 0.8,
   );
 
-  static const TextStyle monthMiniDayNumber = TextStyle (
+  static const TextStyle monthMiniDayNumber = TextStyle(
     fontFamily: _boardFont,
     fontSize: 8,
     fontWeight: FontWeight.w400,
     color: AppColors.textDark,
   );
 
-
-  static const TextStyle monthMiniDayNumberSunday = TextStyle (
+  static const TextStyle monthMiniDayNumberSunday = TextStyle(
     fontFamily: _boardFont,
-    fontSize: 13,
-    fontWeight: FontWeight.w500,
+    fontSize: 8,
+    fontWeight: FontWeight.w400,
     color: AppColors.sundayRed,
   );
 
-
-  // Post-its
-  static const TextStyle stickyNoteMain = TextStyle (
+  // ── Post-its ─────────────────────────────────────────────────────────────
+  static const TextStyle stickyNoteMain = TextStyle(
     fontFamily: _handwrittenFont,
     fontSize: 13,
     fontWeight: FontWeight.w400,
     color: AppColors.textOnSticky,
-    height:1.3,
+    height: 1.3,
   );
 
-  static const TextStyle stickyNoteMini = TextStyle (
+  static const TextStyle stickyNoteMini = TextStyle(
     fontFamily: _handwrittenFont,
     fontSize: 9,
     fontWeight: FontWeight.w400,
@@ -100,7 +97,7 @@ class AppTextStyles {
     height: 1.2,
   );
 
-  //Dialog /UI
+  // ── Dialog / UI ──────────────────────────────────────────────────────────
   static const TextStyle dialogTitle = TextStyle(
     fontFamily: _handwrittenFont,
     fontSize: 20,
@@ -108,10 +105,10 @@ class AppTextStyles {
     color: AppColors.textOnSticky,
   );
 
-  static const TextStyle dialogInput = TextStyle (
+  static const TextStyle dialogInput = TextStyle(
     fontFamily: _handwrittenFont,
     fontSize: 16,
-    color: AppColors.textDark,
+    color: AppColors.textOnSticky,
     height: 1.4,
   );
 }

@@ -43,13 +43,13 @@ class CalendarEvent {
       'startMinute': startTime?.minute,
       'endHour': endTime?.hour,
       'endMinute': endTime?.minute,
-      'isAllDay':isAllDay,
+      'isAllDay': isAllDay,
     };
   }
 
-  factory CalendarEvent.fromMap(Map<String, dynamic> map){
+  factory CalendarEvent.fromMap(Map<String, dynamic> map) {
     TimeOfDay? parseTime(dynamic h, dynamic m) {
-      if (h==null || m == null) return null;
+      if (h == null || m == null) return null;
       return TimeOfDay(hour: h as int, minute: m as int);
     }
 
@@ -63,26 +63,28 @@ class CalendarEvent {
     );
   }
 
+  /// Format affiché sur le calendrier, ex: "16:00 Eat" ou "Service Planned"
   String get displayLabel {
     if (isAllDay || startTime == null) return title;
     final h = startTime!.hour.toString().padLeft(2, '0');
     final m = startTime!.minute.toString().padLeft(2, '0');
-    return '$h:$m $ title';
-  } 
+    return '$h:$m $title';
+  }
 
   @override
   bool operator ==(Object other) => other is CalendarEvent && other.id == id;
-  
+
   @override
   int get hashCode => id.hashCode;
 }
 
+/// Redéfini ici pour éviter l'import de Material dans le modèle
 class TimeOfDay {
   final int hour;
   final int minute;
-  const TImeOfDay({required this.hour, required this.minute});
+  const TimeOfDay({required this.hour, required this.minute});
 
   @override
   String toString() =>
-    '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0'}';
+      '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_dimensions.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../models/sticky_note.dart';
@@ -51,10 +50,7 @@ class _StickyBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
-      painter: _StickyPainter(
-        baseColor: _baseColor,
-        shadowColor: _shadowColor,
-      ),
+      painter: _StickyPainter(baseColor: _baseColor, shadowColor: _shadowColor),
       child: SizedBox(
         width: width,
         height: height,
@@ -87,10 +83,7 @@ class _StickyPainter extends CustomPainter {
   final Color baseColor;
   final Color shadowColor;
 
-  const _StickyPainter({
-    required this.baseColor,
-    required this.shadowColor,
-  });
+  const _StickyPainter({required this.baseColor, required this.shadowColor});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -101,27 +94,24 @@ class _StickyPainter extends CustomPainter {
 
     // ── 1. Ombre portée ────────────────────────────────────────────────
     final shadowPaint = Paint()
-      ..color = shadowColor.withOpacity(0.35)
+      ..color = shadowColor.withValues(alpha: 0.35)
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
 
     canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromLTWH(2, 3, w, h),
-        Radius.circular(r),
-      ),
+      RRect.fromRectAndRadius(Rect.fromLTWH(2, 3, w, h), Radius.circular(r)),
       shadowPaint,
     );
 
     // ── 2. Corps principal du post-it ──────────────────────────────────
     final bodyPath = Path()
-      ..moveTo(foldSize, 0)           // après le coin replié
+      ..moveTo(foldSize, 0) // après le coin replié
       ..lineTo(w - r, 0)
       ..arcToPoint(Offset(w, r), radius: Radius.circular(r))
       ..lineTo(w, h - r)
       ..arcToPoint(Offset(w - r, h), radius: Radius.circular(r))
       ..lineTo(r, h)
       ..arcToPoint(Offset(0, h - r), radius: Radius.circular(r))
-      ..lineTo(0, foldSize)           // côté gauche jusqu'au fold
+      ..lineTo(0, foldSize) // côté gauche jusqu'au fold
       ..close();
 
     final bodyPaint = Paint()
@@ -130,7 +120,7 @@ class _StickyPainter extends CustomPainter {
         end: Alignment.bottomRight,
         colors: [
           baseColor,
-          baseColor.withOpacity(0.88),
+          baseColor.withValues(alpha: 0.88),
           Color.lerp(baseColor, Colors.white, 0.15)!,
         ],
         stops: const [0.0, 0.6, 1.0],
@@ -150,8 +140,8 @@ class _StickyPainter extends CustomPainter {
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
         colors: [
-          shadowColor.withOpacity(0.55),
-          shadowColor.withOpacity(0.25),
+          shadowColor.withValues(alpha: 0.55),
+          shadowColor.withValues(alpha: 0.25),
         ],
       ).createShader(Rect.fromLTWH(0, 0, foldSize, foldSize));
 
@@ -159,7 +149,7 @@ class _StickyPainter extends CustomPainter {
 
     // Ligne de pli
     final foldLinePaint = Paint()
-      ..color = shadowColor.withOpacity(0.4)
+      ..color = shadowColor.withValues(alpha: 0.4)
       ..strokeWidth = 0.8
       ..style = PaintingStyle.stroke;
     canvas.drawLine(Offset(0, foldSize), Offset(foldSize, 0), foldLinePaint);
@@ -169,10 +159,7 @@ class _StickyPainter extends CustomPainter {
       ..shader = LinearGradient(
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
-        colors: [
-          Colors.white.withOpacity(0.30),
-          Colors.transparent,
-        ],
+        colors: [Colors.white.withValues(alpha: 0.30), Colors.transparent],
       ).createShader(Rect.fromLTWH(foldSize, 0, w - foldSize, h * 0.4));
 
     canvas.drawPath(bodyPath, glossPaint);

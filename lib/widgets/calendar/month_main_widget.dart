@@ -34,10 +34,7 @@ class MonthMainWidget extends StatelessWidget {
             height: AppDimensions.mainMonthDayRowH,
             decoration: BoxDecoration(
               border: Border(
-                bottom: BorderSide(
-                  color: AppColors.boardGrid,
-                  width: 1,
-                ),
+                bottom: BorderSide(color: AppColors.boardGrid, width: 1),
               ),
             ),
             child: const MonthHeader(isMain: true),
@@ -89,11 +86,7 @@ class _MainGrid extends StatelessWidget {
   final void Function(DateTime)? onDayTap;
   final void Function(StickyNote)? onNoteTap;
 
-  const _MainGrid({
-    required this.month,
-    this.onDayTap,
-    this.onNoteTap,
-  });
+  const _MainGrid({required this.month, this.onDayTap, this.onNoteTap});
 
   @override
   Widget build(BuildContext context) {
@@ -112,17 +105,18 @@ class _MainGrid extends StatelessWidget {
                   child: Container(
                     decoration: BoxDecoration(
                       border: Border.all(
-                        color: AppColors.boardGrid.withOpacity(0.3),
+                        color: AppColors.boardGrid.withValues(alpha: 0.3),
                         width: 0.5,
                       ),
-                      color: AppColors.boardGrid.withOpacity(0.05),
+                      color: AppColors.boardGrid.withValues(alpha: 0.05),
                     ),
                   ),
                 );
               }
 
               final date = DateTime(month.year, month.month, day);
-              final isToday = date.year == now.year &&
+              final isToday =
+                  date.year == now.year &&
                   date.month == now.month &&
                   date.day == now.day;
 
