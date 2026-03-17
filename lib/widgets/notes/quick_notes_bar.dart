@@ -22,22 +22,36 @@ class QuickNotesBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: List.generate(kMaxNotes, (i) {
-        final hasNote = i < notes.length;
-        final note = hasNote ? notes[i] : null;
-        return Expanded(
-          child: _NoteSlot(
-            note: note,
-            isLast: i == kMaxNotes - 1,
-            onTap: hasNote
-                ? () => onNoteTap?.call(note!)
-                : () => onAddNote?.call(),
-            onLongPress: hasNote ? () => onNoteLongPress?.call(note!) : null,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Taille d'un slot = largeur totale / 5 → carré parfait
+        final slotSize = constraints.maxWidth / kMaxNotes;
+
+        return SizedBox(
+          height: slotSize, // ← hauteur = largeur d'un slot = carré
+          child: Row(
+            children: List.generate(kMaxNotes, (i) {
+              final hasNote = i < notes.length;
+              final note = hasNote ? notes[i] : null;
+
+              return SizedBox(
+                width: slotSize,
+                height: slotSize,
+                child: _NoteSlot(
+                  note: note,
+                  isLast: i == kMaxNotes - 1,
+                  onTap: hasNote
+                      ? () => onNoteTap?.call(note!)
+                      : () => onAddNote?.call(),
+                  onLongPress: hasNote
+                      ? () => onNoteLongPress?.call(note!)
+                      : null,
+                ),
+              );
+            }),
           ),
         );
-      }),
+      },
     );
   }
 }

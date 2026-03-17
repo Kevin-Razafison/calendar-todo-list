@@ -11,7 +11,10 @@ class AppColors {
   static const Color woodShadow = Color(0xFF2A1200); // ombre profonde
 
   // ── Tableau blanc (fond des mois) ────────────────────────────────────────
-  static const Color boardWhite = Color(0xFFF5F3EE); // blanc légèrement ivoire
+  static const Color boardWhite = Color(0xFFF5F3EE); // mini-mois
+  static const Color mainMonthBg = Color(
+    0xFFF0E6D3,
+  ); // ← beige plus chaud et visible// mois central — beige chaud
   static const Color boardGrid = Color(0xFFDDDAD3); // lignes de séparation
   static const Color boardShadow = Color(0x33000000); // ombre portée des mois
 

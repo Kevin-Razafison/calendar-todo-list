@@ -7,7 +7,7 @@ extension StickyNoteColorExtension on StickyNoteColor {
   Color get color {
     switch (this) {
       case StickyNoteColor.yellow:
-        return const Color(0xFFFFF176); // jaune classique post-it
+        return const Color(0xFFFFF176);
       case StickyNoteColor.green:
         return const Color(0xFFB9F6CA);
       case StickyNoteColor.pink:
@@ -60,10 +60,11 @@ extension StickyNoteColorExtension on StickyNoteColor {
 class StickyNote {
   final String id;
   final String text;
-  final DateTime date; // La date (jour) sur laquelle la note est collée
+  final DateTime date;
   final StickyNoteColor color;
-  final double
-  rotationAngle; // Légère rotation pour l'effet réaliste (-0.1 à 0.1 rad)
+  final double rotationAngle;
+  final bool isBold; // ← ajouté
+  final bool isItalic; // ← ajouté
   final DateTime createdAt;
   final DateTime? updatedAt;
 
@@ -73,15 +74,15 @@ class StickyNote {
     required this.date,
     this.color = StickyNoteColor.yellow,
     double? rotationAngle,
+    this.isBold = false, // ← ajouté
+    this.isItalic = false, // ← ajouté
     DateTime? createdAt,
     this.updatedAt,
   }) : id = id ?? const Uuid().v4(),
        rotationAngle = rotationAngle ?? _randomAngle(),
        createdAt = createdAt ?? DateTime.now();
 
-  /// Génère un angle de rotation légèrement aléatoire mais déterministe selon l'id
   static double _randomAngle() {
-    // Entre -0.08 et +0.08 radians (~5°)
     return (DateTime.now().millisecondsSinceEpoch % 17 - 8) / 100.0;
   }
 
@@ -90,6 +91,8 @@ class StickyNote {
     DateTime? date,
     StickyNoteColor? color,
     double? rotationAngle,
+    bool? isBold, // ← ajouté
+    bool? isItalic, // ← ajouté
   }) {
     return StickyNote(
       id: id,
@@ -97,12 +100,12 @@ class StickyNote {
       date: date ?? this.date,
       color: color ?? this.color,
       rotationAngle: rotationAngle ?? this.rotationAngle,
+      isBold: isBold ?? this.isBold,
+      isItalic: isItalic ?? this.isItalic,
       createdAt: createdAt,
       updatedAt: DateTime.now(),
     );
   }
-
-  // ── Sérialisation Hive/JSON ──────────────────────────────────────────────
 
   Map<String, dynamic> toMap() {
     return {
@@ -111,6 +114,8 @@ class StickyNote {
       'date': date.toIso8601String(),
       'color': color.name,
       'rotationAngle': rotationAngle,
+      'isBold': isBold,
+      'isItalic': isItalic,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
     };
@@ -123,6 +128,8 @@ class StickyNote {
       date: DateTime.parse(map['date'] as String),
       color: StickyNoteColorExtension.fromString(map['color'] as String),
       rotationAngle: (map['rotationAngle'] as num).toDouble(),
+      isBold: map['isBold'] as bool? ?? false,
+      isItalic: map['isItalic'] as bool? ?? false,
       createdAt: DateTime.parse(map['createdAt'] as String),
       updatedAt: map['updatedAt'] != null
           ? DateTime.parse(map['updatedAt'] as String)

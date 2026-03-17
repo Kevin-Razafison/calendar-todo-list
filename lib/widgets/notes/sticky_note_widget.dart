@@ -7,7 +7,7 @@ class StickyNoteWidget extends StatelessWidget {
   final StickyNote note;
   final double width;
   final double height;
-  final bool isCompact; // true = mini-mois, false = mois central
+  final bool isCompact;
 
   const StickyNoteWidget({
     super.key,
@@ -63,9 +63,19 @@ class _StickyBody extends StatelessWidget {
           ),
           child: Text(
             note.text,
-            style: isCompact
-                ? AppTextStyles.stickyNoteMini
-                : AppTextStyles.stickyNoteMain,
+            style:
+                (isCompact
+                        ? AppTextStyles.stickyNoteMini
+                        : AppTextStyles.stickyNoteMain)
+                    .copyWith(
+                      // ← isBold et isItalic appliqués ici
+                      fontWeight: note.isBold
+                          ? FontWeight.w800
+                          : FontWeight.w400,
+                      fontStyle: note.isItalic
+                          ? FontStyle.italic
+                          : FontStyle.normal,
+                    ),
             maxLines: isCompact ? 2 : 4,
             overflow: TextOverflow.ellipsis,
           ),
@@ -75,10 +85,6 @@ class _StickyBody extends StatelessWidget {
   }
 }
 
-/// Peint le post-it avec :
-/// - coin supérieur gauche replié (fold effect)
-/// - ombre portée réaliste
-/// - dégradé léger simulant le papier
 class _StickyPainter extends CustomPainter {
   final Color baseColor;
   final Color shadowColor;
@@ -90,9 +96,9 @@ class _StickyPainter extends CustomPainter {
     final w = size.width;
     final h = size.height;
     final r = AppDimensions.stickyCornerRadius;
-    final foldSize = w * 0.22; // taille du coin replié
+    final foldSize = w * 0.22;
 
-    // ── 1. Ombre portée ────────────────────────────────────────────────
+    // ── 1. Ombre portée ──────────────────────────────────────────────
     final shadowPaint = Paint()
       ..color = shadowColor.withValues(alpha: 0.35)
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
@@ -102,16 +108,16 @@ class _StickyPainter extends CustomPainter {
       shadowPaint,
     );
 
-    // ── 2. Corps principal du post-it ──────────────────────────────────
+    // ── 2. Corps principal ───────────────────────────────────────────
     final bodyPath = Path()
-      ..moveTo(foldSize, 0) // après le coin replié
+      ..moveTo(foldSize, 0)
       ..lineTo(w - r, 0)
       ..arcToPoint(Offset(w, r), radius: Radius.circular(r))
       ..lineTo(w, h - r)
       ..arcToPoint(Offset(w - r, h), radius: Radius.circular(r))
       ..lineTo(r, h)
       ..arcToPoint(Offset(0, h - r), radius: Radius.circular(r))
-      ..lineTo(0, foldSize) // côté gauche jusqu'au fold
+      ..lineTo(0, foldSize)
       ..close();
 
     final bodyPaint = Paint()
@@ -128,7 +134,7 @@ class _StickyPainter extends CustomPainter {
 
     canvas.drawPath(bodyPath, bodyPaint);
 
-    // ── 3. Coin replié (triangle sombre) ───────────────────────────────
+    // ── 3. Coin replié ───────────────────────────────────────────────
     final foldPath = Path()
       ..moveTo(0, foldSize)
       ..lineTo(foldSize, 0)
@@ -147,14 +153,13 @@ class _StickyPainter extends CustomPainter {
 
     canvas.drawPath(foldPath, foldPaint);
 
-    // Ligne de pli
     final foldLinePaint = Paint()
       ..color = shadowColor.withValues(alpha: 0.4)
       ..strokeWidth = 0.8
       ..style = PaintingStyle.stroke;
     canvas.drawLine(Offset(0, foldSize), Offset(foldSize, 0), foldLinePaint);
 
-    // ── 4. Reflet léger en haut ────────────────────────────────────────
+    // ── 4. Reflet ────────────────────────────────────────────────────
     final glossPaint = Paint()
       ..shader = LinearGradient(
         begin: Alignment.topCenter,

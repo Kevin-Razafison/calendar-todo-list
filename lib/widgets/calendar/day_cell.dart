@@ -36,31 +36,34 @@ class DayCell extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: AppColors.boardGrid.withValues(alpha: 0.5),
-            width: 0.5,
+      child: ClipRect(
+        // ← sur les deux
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: AppColors.boardGrid.withValues(alpha: 0.5),
+              width: 0.5,
+            ),
           ),
+          child: isMain
+              ? _MainCell(
+                  day: day!,
+                  isToday: isToday,
+                  isSunday: isSunday,
+                  notes: notes,
+                  events: events,
+                  onNoteTap: onNoteTap,
+                  onAddNote: onTap,
+                )
+              : _MiniCell(
+                  day: day!,
+                  isToday: isToday,
+                  isSunday: isSunday,
+                  notes: notes,
+                  onNoteTap: onNoteTap,
+                  onAddNote: onTap,
+                ),
         ),
-        child: isMain
-            ? _MainCell(
-                day: day!,
-                isToday: isToday,
-                isSunday: isSunday,
-                notes: notes,
-                events: events,
-                onNoteTap: onNoteTap,
-                onAddNote: onTap,
-              )
-            : _MiniCell(
-                day: day!,
-                isToday: isToday,
-                isSunday: isSunday,
-                notes: notes,
-                onNoteTap: onNoteTap, // ← ajouté
-                onAddNote: onTap, // ← ajouté
-              ),
       ),
     );
   }
@@ -90,7 +93,7 @@ class _MainCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Stack(
-      clipBehavior: Clip.none,
+      clipBehavior: Clip.hardEdge,
       children: [
         Positioned(
           top: 3,
@@ -126,8 +129,8 @@ class _MainCell extends StatelessWidget {
 
         if (notes.isNotEmpty)
           Positioned(
-            bottom: 2,
-            right: 2,
+            top: 4, // ← était bottom: 2
+            right: 2, // ← même
             child: _StickyStack(
               notes: notes,
               isMain: true,
@@ -187,7 +190,7 @@ class _MiniCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Stack(
-      clipBehavior: Clip.none,
+      clipBehavior: Clip.hardEdge,
       children: [
         Center(
           child: _DayNumber(
@@ -200,13 +203,13 @@ class _MiniCell extends StatelessWidget {
 
         if (notes.isNotEmpty)
           Positioned(
-            bottom: 0,
+            top: 1, // ← était bottom: 0
             right: 0,
             child: _StickyStack(
               notes: notes,
               isMain: false,
-              onNoteTap: onNoteTap, // ← ajouté
-              onAddNote: onAddNote, // ← ajouté
+              onNoteTap: onNoteTap,
+              onAddNote: onAddNote,
             ),
           ),
       ],
@@ -306,54 +309,67 @@ class _StickyStack extends StatelessWidget {
     final visibleNotes = notes.take(maxVisible).toList();
     final extraCount = notes.length - maxVisible;
 
-    final noteW = isMain
-        ? AppDimensions.stickyNoteMainW
-        : AppDimensions.stickyNoteW;
-    final noteH = isMain
-        ? AppDimensions.stickyNoteMainH
-        : AppDimensions.stickyNoteH;
-
     final offsetX = AppDimensions.stickyStackOffsetX;
     final offsetY = AppDimensions.stickyStackOffsetY;
 
-    final stackW = noteW + (visibleNotes.length - 1) * offsetX;
-    final stackH = noteH + (visibleNotes.length - 1) * offsetY;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // ← Taille calculée depuis le conteneur disponible
+        final availW = constraints.maxWidth;
+        final availH = constraints.maxHeight;
 
-    return SizedBox(
-      width: stackW,
-      height: stackH,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          ...List.generate(visibleNotes.length, (i) {
-            final note = visibleNotes[visibleNotes.length - 1 - i];
-            final revI = visibleNotes.length - 1 - i;
+        final noteW = isMain
+            ? (availW - (visibleNotes.length - 1) * offsetX).clamp(
+                30.0,
+                AppDimensions.stickyNoteMainW,
+              )
+            : AppDimensions.stickyNoteW;
+        final noteH = isMain
+            ? (availH - (visibleNotes.length - 1) * offsetY).clamp(
+                20.0,
+                AppDimensions.stickyNoteMainH,
+              )
+            : AppDimensions.stickyNoteH;
 
-            return Positioned(
-              left: revI * offsetX,
-              top: revI * offsetY,
-              child: GestureDetector(
-                // ← Tap sur le stack = afficher TOUTES les notes
-                onTap: () => _showAllNotes(context),
-                behavior: HitTestBehavior.opaque,
-                child: StickyNoteWidget(
-                  note: note,
-                  width: noteW,
-                  height: noteH,
-                  isCompact: !isMain,
+        final stackW = noteW + (visibleNotes.length - 1) * offsetX;
+        final stackH = noteH + (visibleNotes.length - 1) * offsetY;
+
+        return SizedBox(
+          width: stackW,
+          height: stackH,
+          child: Stack(
+            clipBehavior: Clip.hardEdge,
+            children: [
+              ...List.generate(visibleNotes.length, (i) {
+                final note = visibleNotes[visibleNotes.length - 1 - i];
+                final revI = visibleNotes.length - 1 - i;
+
+                return Positioned(
+                  left: revI * offsetX,
+                  top: revI * offsetY,
+                  child: GestureDetector(
+                    onTap: () => _showAllNotes(context),
+                    behavior: HitTestBehavior.opaque,
+                    child: StickyNoteWidget(
+                      note: note,
+                      width: noteW,
+                      height: noteH,
+                      isCompact: !isMain,
+                    ),
+                  ),
+                );
+              }),
+
+              if (extraCount > 0)
+                Positioned(
+                  top: -AppDimensions.noteBadgeSize / 2,
+                  right: -AppDimensions.noteBadgeSize / 2,
+                  child: _ExtraBadge(count: extraCount),
                 ),
-              ),
-            );
-          }),
-
-          if (extraCount > 0)
-            Positioned(
-              top: -AppDimensions.noteBadgeSize / 2,
-              right: -AppDimensions.noteBadgeSize / 2,
-              child: _ExtraBadge(count: extraCount),
-            ),
-        ],
-      ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

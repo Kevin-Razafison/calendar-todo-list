@@ -31,15 +31,15 @@ class AppDimensions {
   static const double miniDayNumberSize = 10.0;
 
   // ── Post-its ─────────────────────────────────────────────────────────────
-  static const double stickyNoteW = 42.0; // largeur sur mini-mois
-  static const double stickyNoteH = 30.0; // hauteur sur mini-mois
-  static const double stickyNoteMainW = 80.0; // largeur sur mois central
-  static const double stickyNoteMainH = 55.0; // hauteur sur mois central
+  static const double stickyNoteW = 22.0; // ← mini-mois plus petit
+  static const double stickyNoteH = 16.0;
+  static const double stickyNoteMainW = 62.0;
+  static const double stickyNoteMainH = 35.0;
 
   /// Décalage de chaque post-it supplémentaire sur un même jour
   /// → crée l'effet de chevauchement visible
-  static const double stickyStackOffsetX = 5.0;
-  static const double stickyStackOffsetY = 3.0;
+  static const double stickyStackOffsetX = 3.0;
+  static const double stickyStackOffsetY = 2.0;
   static const double stickyMaxStackShown =
       3.0; // max post-its visibles empilés
 

@@ -66,7 +66,7 @@ class _MainTitle extends StatelessWidget {
     return Container(
       height: AppDimensions.mainMonthHeaderH,
       decoration: BoxDecoration(
-        color: AppColors.boardWhite,
+        color: AppColors.mainMonthBg,
         border: Border(
           bottom: BorderSide(color: AppColors.boardGrid, width: 1.5),
         ),
@@ -105,10 +105,10 @@ class _MainGrid extends StatelessWidget {
                   child: Container(
                     decoration: BoxDecoration(
                       border: Border.all(
-                        color: AppColors.boardGrid.withValues(alpha: 0.3),
+                        color: AppColors.mainMonthBg.withValues(alpha: 0.6),
                         width: 0.5,
                       ),
-                      color: AppColors.boardGrid.withValues(alpha: 0.05),
+                      color: AppColors.mainMonthBg.withValues(alpha: 0.6),
                     ),
                   ),
                 );
